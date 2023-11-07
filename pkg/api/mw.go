@@ -1,6 +1,5 @@
+// MiddleWare для записи заголовков ответа, подержки сквозного id запроса и логгирования
 package api
-
-//MiddleWare
 
 import (
 	"context"
@@ -45,21 +44,22 @@ func (api *API) RequestIDMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-//структура и метод для логгирования http кода ответа
+// структура и метод для логгирования http кода ответа
 type loggingResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
 }
+
 func (c *loggingResponseWriter) WriteHeader(statusCode int) {
 	c.statusCode = statusCode
 	c.ResponseWriter.WriteHeader(statusCode)
 }
 
-//миддлваре для логгирования ответов
+// миддлваре для логгирования ответов
 func (api *API) LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						
-		logWR:=&loggingResponseWriter{ResponseWriter: w}
+
+		logWR := &loggingResponseWriter{ResponseWriter: w}
 		// Call the next handler in the chain with custom ResponseWriter that saves http code
 		next.ServeHTTP(logWR, r)
 		// After the request handler is called
